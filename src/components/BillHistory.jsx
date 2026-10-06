@@ -35,6 +35,7 @@ export default function BillHistory({
           name,
           room: bill.room || '',
           phone: bill.phone || '',
+          rentDueDay: bill.rentDueDay || null,
           bills: [],
           totalAmount: 0,
           latestDate: bill.billDate || ''
@@ -44,6 +45,7 @@ export default function BillHistory({
       groups[name].totalAmount += (Number(bill.grandTotal) || 0);
       if (bill.room && !groups[name].room) groups[name].room = bill.room;
       if (bill.phone && !groups[name].phone) groups[name].phone = bill.phone;
+      if (bill.rentDueDay && !groups[name].rentDueDay) groups[name].rentDueDay = bill.rentDueDay;
       if (bill.billDate && (!groups[name].latestDate || bill.billDate > groups[name].latestDate)) {
         groups[name].latestDate = bill.billDate;
       }
@@ -307,6 +309,23 @@ export default function BillHistory({
                             color: '#cbd5e1'
                           }}>
                             {group.room}
+                          </span>
+                        )}
+                        {group.rentDueDay && (
+                          <span style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: 6,
+                            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                            color: '#a5b4fc',
+                            border: '1px solid rgba(99, 102, 241, 0.25)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4
+                          }}>
+                            <Calendar size={11} />
+                            <span>Due: {group.rentDueDay} tareekh</span>
                           </span>
                         )}
                       </div>

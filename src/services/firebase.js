@@ -266,6 +266,7 @@ export const createTenant = async (tenantData) => {
     rent: Number(tenantData.rent) || 0,
     waterBill: Number(tenantData.waterBill) || 0,
     unitRate: Number(tenantData.unitRate) || 0,
+    rentDueDay: tenantData.rentDueDay !== undefined && tenantData.rentDueDay !== '' ? Number(tenantData.rentDueDay) : null,
     createdAt: new Date().toISOString()
   };
 
@@ -297,6 +298,7 @@ export const updateTenantDetails = async (id, updateData) => {
   if (sanitized.rent !== undefined) sanitized.rent = Number(sanitized.rent);
   if (sanitized.waterBill !== undefined) sanitized.waterBill = Number(sanitized.waterBill);
   if (sanitized.unitRate !== undefined) sanitized.unitRate = Number(sanitized.unitRate);
+  if (sanitized.rentDueDay !== undefined && sanitized.rentDueDay !== '') sanitized.rentDueDay = Number(sanitized.rentDueDay);
 
   if (dbInstance && !id.startsWith('local_') && !id.startsWith('tenant_')) {
     try {

@@ -73,6 +73,7 @@ export default function BillReceiptModal({
     return `*RENT & UTILITY BILL* 🧾\n` +
       `*Owner:* Gautam Rent, Owner\n` +
       `*Kirayedaar:* ${bill.tenantName} (${bill.room ? `Room ${bill.room}` : 'Resident'})\n` +
+      (bill.rentDueDay ? `📅 *Kiraya Tareekh:* Har mahine ki ${bill.rentDueDay} tareekh\n` : '') +
       `*Date:* ${bill.billDate || ''} (${bill.billingMonth})\n` +
       `--------------------------------\n` +
       `🏠 *Rent:* ${currencySymbol}${bill.rentAmount}\n` +
@@ -361,6 +362,11 @@ export default function BillReceiptModal({
                   {bill.room ? `Room / Flat: ${bill.room}` : 'Resident'}
                   {bill.phone ? ` • Mob: ${bill.phone}` : ''}
                 </div>
+                {bill.rentDueDay && (
+                  <div style={{ fontSize: '0.78rem', color: '#4f46e5', fontWeight: 600, marginTop: 3 }}>
+                    Kiraya Tareekh: Har mahine ki {bill.rentDueDay} tareekh
+                  </div>
+                )}
               </div>
 
               <div style={{ textAlign: 'right' }}>

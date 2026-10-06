@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, UserPlus, Check } from 'lucide-react';
+import { X, UserPlus, Check, Calendar } from 'lucide-react';
 
 export default function KirayedaarModal({
   isOpen,
@@ -15,7 +15,8 @@ export default function KirayedaarModal({
     previousReading: '',
     rent: '',
     waterBill: '200',
-    unitRate: '12'
+    unitRate: '12',
+    rentDueDay: ''
   });
   const [formError, setFormError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -29,7 +30,8 @@ export default function KirayedaarModal({
         previousReading: tenant.previousReading !== undefined && tenant.previousReading !== null ? tenant.previousReading : '',
         rent: tenant.rent !== undefined ? tenant.rent : '',
         waterBill: tenant.waterBill !== undefined ? tenant.waterBill : '200',
-        unitRate: tenant.unitRate || '12'
+        unitRate: tenant.unitRate || '12',
+        rentDueDay: tenant.rentDueDay !== undefined && tenant.rentDueDay !== null ? String(tenant.rentDueDay) : ''
       });
     } else {
       setFormData({
@@ -39,7 +41,8 @@ export default function KirayedaarModal({
         previousReading: '',
         rent: '',
         waterBill: '200',
-        unitRate: '12'
+        unitRate: '12',
+        rentDueDay: ''
       });
     }
     setFormError('');
@@ -96,6 +99,11 @@ export default function KirayedaarModal({
       return;
     }
 
+    if (!formData.rentDueDay || isNaN(formData.rentDueDay) || Number(formData.rentDueDay) < 1 || Number(formData.rentDueDay) > 31) {
+      setFormError('Kiraya lene ki tareekh select karna zaroori hai (1 se 31 ke beech).');
+      return;
+    }
+
     try {
       setIsSaving(true);
       const success = await onSave({
@@ -106,7 +114,8 @@ export default function KirayedaarModal({
         previousReading: Number(formData.previousReading),
         unitRate: Number(formData.unitRate),
         rent: Number(formData.rent),
-        waterBill: Number(formData.waterBill)
+        waterBill: Number(formData.waterBill),
+        rentDueDay: Number(formData.rentDueDay)
       });
       if (success) {
         onClose();
@@ -302,6 +311,71 @@ export default function KirayedaarModal({
                 onChange={(e) => setFormData({ ...formData, waterBill: e.target.value })}
               />
             </div>
+          </div>
+
+          {/* Kiraya Lene Ki Tareekh (Rent Due Day) - REQUIRED */}
+          <div style={{
+            padding: '14px',
+            backgroundColor: 'rgba(99, 102, 241, 0.07)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid rgba(99, 102, 241, 0.25)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label className="input-label" style={{ margin: 0, color: '#a5b4fc', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Calendar size={14} />
+                <span>Kiraya Lene Ki Tareekh (Rent Due Date) *</span>
+              </label>
+              {formData.rentDueDay && (
+                <span style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 700 }}>
+                  Har mahine ki {formData.rentDueDay} tareekh
+                </span>
+              )}
+            </div>
+
+            <select
+              required
+              className="form-select"
+              value={formData.rentDueDay}
+              onChange={(e) => setFormData({ ...formData, rentDueDay: e.target.value })}
+              style={{ fontSize: '0.95rem', fontWeight: 600, width: '100%', borderColor: formData.rentDueDay ? '#818cf8' : undefined }}
+            >
+              <option value="" disabled>-- Kiraya kis tareekh ko lena hai? (1 to 31) * --</option>
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
+                const suffix = (day > 3 && day < 21) ? 'th' : (day % 10 === 1 ? 'st' : day % 10 === 2 ? 'nd' : day % 10 === 3 ? 'rd' : 'th');
+                return (
+                  <option key={day} value={day} style={{ backgroundColor: '#111827', color: '#ffffff' }}>
+                    {day} tareekh ({day}{suffix} of every month)
+                  </option>
+                );
+              })}
+            </select>
+
+            {/* Quick selection pills for common rent dates */}
+            <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Quick pick:</span>
+              {[1, 5, 7, 10, 15, 20, 25, 30].map(day => (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, rentDueDay: String(day) })}
+                  style={{
+                    padding: '3px 8px',
+                    borderRadius: 6,
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    border: formData.rentDueDay === String(day) ? '1px solid #818cf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: formData.rentDueDay === String(day) ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                    color: formData.rentDueDay === String(day) ? '#ffffff' : 'var(--text-muted)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {day} tareekh
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: '0.73rem', color: 'var(--text-dim)', margin: '6px 0 0' }}>
+              Har mahine is tareekh ko kirayedaar se kiraya lena hai.
+            </p>
           </div>
 
           {/* Submit Buttons */}

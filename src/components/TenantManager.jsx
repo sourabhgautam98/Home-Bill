@@ -11,7 +11,8 @@ import {
   Search,
   PlusCircle,
   FileText,
-  X
+  X,
+  Calendar
 } from 'lucide-react';
 import { formatCurrency } from '../utils/numberToWords';
 
@@ -214,6 +215,27 @@ export default function TenantManager({
                     <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#fbbf24' }}>
                       {currencySymbol}{tenant.unitRate || 12}/unit
                     </div>
+                  </div>
+                </div>
+
+                {/* Kiraya Lene Ki Tareekh (Rent Due Day) */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                  border: '1px solid rgba(99, 102, 241, 0.22)',
+                  padding: '9px 12px',
+                  borderRadius: 10,
+                  marginBottom: 16,
+                  fontSize: '0.825rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#a5b4fc', fontWeight: 600 }}>
+                    <Calendar size={14} color="#818cf8" />
+                    <span>Kiraya Lene Ki Tareekh:</span>
+                  </div>
+                  <div style={{ fontWeight: 800, color: tenant.rentDueDay ? '#38bdf8' : '#fb7185' }}>
+                    {tenant.rentDueDay ? `Har mahine ki ${tenant.rentDueDay} tareekh` : 'Not Set'}
                   </div>
                 </div>
               </div>

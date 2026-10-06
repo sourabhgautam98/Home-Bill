@@ -190,6 +190,7 @@ export default function BillGenerator({
         tenantName: selectedTenant.name,
         room: selectedTenant.room || '',
         phone: selectedTenant.phone || '',
+        rentDueDay: selectedTenant.rentDueDay || null,
         rentAmount: rentVal,
         waterBill: waterVal,
         previousReading: prevR,
@@ -315,7 +316,7 @@ export default function BillGenerator({
               >
                 {tenants.map(t => (
                   <option key={t.id} value={t.id} style={{ backgroundColor: '#111827', color: '#ffffff' }}>
-                    {t.name}
+                    {t.name}{t.room ? ` (${t.room})` : ''}{t.rentDueDay ? ` • Due: ${t.rentDueDay} tareekh` : ''}
                   </option>
                 ))}
               </select>
@@ -625,6 +626,24 @@ export default function BillGenerator({
                   {selectedTenant?.room ? `${selectedTenant.room} • ` : ''}
                   {selectedTenant?.phone ? `Mob: ${selectedTenant.phone}` : ''}
                 </div>
+                {selectedTenant?.rentDueDay && (
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: '0.78rem',
+                    color: '#a5b4fc',
+                    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+                    border: '1px solid rgba(99, 102, 241, 0.25)',
+                    padding: '3px 9px',
+                    borderRadius: 6,
+                    marginTop: 6,
+                    fontWeight: 600
+                  }}>
+                    <Calendar size={12} color="#818cf8" />
+                    <span>Kiraya Tareekh: Har mahine ki {selectedTenant.rentDueDay} tareekh</span>
+                  </div>
+                )}
               </div>
 
               {/* Line Items Breakdown Table */}

@@ -7,6 +7,7 @@ import BillReceiptModal from './components/BillReceiptModal';
 import KirayedaarModal from './components/KirayedaarModal';
 import SecurityPinModal from './components/SecurityPinModal';
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
+import AppLockScreen from './components/AppLockScreen';
 import {
   fetchTenants,
   createTenant,
@@ -19,8 +20,48 @@ import {
   getPropertySettings
 } from './services/firebase';
 
+const SESSION_KEY = 'gautam_rent_session_lock';
+const SESSION_DURATION_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+const getInitialLockState = () => {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.expiresAt && Date.now() < parsed.expiresAt) {
+        return {
+          isUnlocked: true,
+          expiresAt: parsed.expiresAt
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading session lock:', e);
+  }
+  return { isUnlocked: false, expiresAt: null };
+};
+
+const getInitialTab = () => {
+  const hash = window.location.hash.replace('#', '').trim();
+  if (['generate', 'tenants', 'history'].includes(hash)) {
+    return hash;
+  }
+  return 'generate';
+};
+
 export default function App() {
-  const [activeTab, setActiveTab] = useState('generate');
+  const initialLock = getInitialLockState();
+  const [isUnlocked, setIsUnlocked] = useState(initialLock.isUnlocked);
+  const [sessionExpiresAt, setSessionExpiresAt] = useState(initialLock.expiresAt);
+  const [remainingSeconds, setRemainingSeconds] = useState(() => {
+    if (initialLock.expiresAt) {
+      return Math.max(0, Math.floor((initialLock.expiresAt - Date.now()) / 1000));
+    }
+    return null;
+  });
+  const [lockReason, setLockReason] = useState('');
+
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [tenants, setTenants] = useState([]);
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +93,67 @@ export default function App() {
 
   // Tab reset keys for instant view refresh on tab click
   const [tabResetKey, setTabResetKey] = useState({ history: 0, tenants: 0 });
+
+  // Sync route / hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim();
+      if (['generate', 'tenants', 'history'].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    window.location.hash = newTab;
+  };
+
+  // 15-minute auto-expiry countdown and lock enforcement
+  useEffect(() => {
+    if (!isUnlocked || !sessionExpiresAt) return;
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = Math.max(0, Math.floor((sessionExpiresAt - now) / 1000));
+      setRemainingSeconds(diff);
+
+      if (diff <= 0) {
+        // Auto lock after 15 minutes
+        sessionStorage.removeItem(SESSION_KEY);
+        setIsUnlocked(false);
+        setSessionExpiresAt(null);
+        setRemainingSeconds(null);
+        setLockReason('Session expired after 15 minutes. Please enter your PIN to continue.');
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [isUnlocked, sessionExpiresAt]);
+
+  const handleUnlock = () => {
+    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      unlockedAt: Date.now(),
+      expiresAt
+    }));
+    setSessionExpiresAt(expiresAt);
+    setRemainingSeconds(15 * 60);
+    setIsUnlocked(true);
+    setLockReason('');
+  };
+
+  const handleLock = (reason = '') => {
+    sessionStorage.removeItem(SESSION_KEY);
+    setIsUnlocked(false);
+    setSessionExpiresAt(null);
+    setRemainingSeconds(null);
+    setLockReason(reason || 'App locked.');
+  };
 
   // Helper function to prompt for 4-digit Security PIN before executing sensitive actions
   const promptPin = ({ title, subtitle, action, onCancelAction }) => {
@@ -94,6 +196,8 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!isUnlocked) return;
+
     // Clear any previous demo tenants from browser localStorage to ensure clean state
     try {
       const raw = localStorage.getItem('rentpulse_local_tenants');
@@ -106,7 +210,7 @@ export default function App() {
       }
     } catch (e) { }
     loadData();
-  }, []);
+  }, [isUnlocked]);
 
   // 1. Save Bill handler (Protected by Security PIN)
   const handleSaveBill = async (billData) => {
@@ -262,16 +366,28 @@ export default function App() {
     setActiveTab('generate');
   };
 
+  // Gatekeeper: Lock all routes, tabs, and data behind PIN lock screen
+  if (!isUnlocked) {
+    return (
+      <AppLockScreen
+        onUnlock={handleUnlock}
+        lockReason={lockReason}
+      />
+    );
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Clean Top Navigation Bar */}
+      {/* Clean Top Navigation Bar with Session Timer & Lock Button */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         tenantCount={tenants.length}
         billCount={bills.length}
         onOpenAddTenantModal={handleOpenAddTenant}
         propertyName={propertySettings?.propertyName}
+        sessionRemainingSeconds={remainingSeconds}
+        onLockNow={() => handleLock('Manually locked.')}
         onTabClick={(tab) => {
           if (tab === 'history') {
             setTabResetKey(prev => ({ ...prev, history: prev.history + 1 }));
