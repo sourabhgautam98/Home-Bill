@@ -6,7 +6,6 @@ import {
   KeyRound,
   Zap,
   Clock,
-  Delete,
   RotateCcw
 } from 'lucide-react';
 import { verifySecurityPin } from '../services/firebase';
@@ -121,44 +120,7 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
     }
   };
 
-  // Virtual Keypad handlers
-  const handleKeypadPress = (digit) => {
-    if (isVerifying) return;
-    const firstEmptyIndex = pinDigits.findIndex(d => d === '');
-    if (firstEmptyIndex === -1) return;
-
-    const newDigits = [...pinDigits];
-    newDigits[firstEmptyIndex] = String(digit);
-    setPinDigits(newDigits);
-    setError('');
-
-    if (firstEmptyIndex < 3 && inputRefs[firstEmptyIndex + 1].current) {
-      inputRefs[firstEmptyIndex + 1].current.focus();
-    }
-
-    if (firstEmptyIndex === 3) {
-      const fullPin = newDigits.join('');
-      if (fullPin.length === 4) {
-        handleVerify(fullPin);
-      }
-    }
-  };
-
-  const handleKeypadBackspace = () => {
-    if (isVerifying) return;
-    const lastFilledIndex = [...pinDigits].reverse().findIndex(d => d !== '');
-    if (lastFilledIndex === -1) return;
-    const actualIndex = 3 - lastFilledIndex;
-
-    const newDigits = [...pinDigits];
-    newDigits[actualIndex] = '';
-    setPinDigits(newDigits);
-    if (inputRefs[actualIndex].current) {
-      inputRefs[actualIndex].current.focus();
-    }
-  };
-
-  const handleKeypadClear = () => {
+  const handleClear = () => {
     if (isVerifying) return;
     setPinDigits(['', '', '', '']);
     setError('');
@@ -166,6 +128,8 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
       inputRefs[0].current.focus();
     }
   };
+
+  const hasAnyDigit = pinDigits.some(d => d !== '');
 
   return (
     <div style={{
@@ -198,9 +162,9 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
         className="glass-card"
         style={{
           width: '100%',
-          maxWidth: 440,
+          maxWidth: 420,
           padding: '36px 28px',
-          backgroundColor: 'rgba(15, 23, 42, 0.92)',
+          backgroundColor: 'rgba(15, 23, 42, 0.94)',
           border: '1px solid rgba(255, 255, 255, 0.14)',
           borderRadius: 24,
           boxShadow: '0 30px 70px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.25)',
@@ -227,11 +191,11 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
         `}</style>
 
         {/* Brand Header */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 22 }}>
           <div style={{
             position: 'relative',
-            width: 72,
-            height: 72,
+            width: 68,
+            height: 68,
             marginBottom: 16
           }}>
             {/* Glowing ring animation */}
@@ -252,7 +216,7 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
               justifyContent: 'center',
               boxShadow: '0 10px 25px rgba(99, 102, 241, 0.45)'
             }}>
-              <Lock size={34} color="#ffffff" strokeWidth={2.4} />
+              <Lock size={32} color="#ffffff" strokeWidth={2.4} />
             </div>
           </div>
 
@@ -337,7 +301,7 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
           display: 'flex',
           justifyContent: 'center',
           gap: 14,
-          marginBottom: 24
+          marginBottom: 16
         }}>
           {pinDigits.map((digit, index) => (
             <input
@@ -359,8 +323,8 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
               onChange={(e) => handleDigitChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               style={{
-                width: 58,
-                height: 64,
+                width: 60,
+                height: 66,
                 textAlign: 'center',
                 fontSize: '1.8rem',
                 fontWeight: 800,
@@ -383,125 +347,33 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
           ))}
         </div>
 
-        {/* Virtual Numeric Keypad for fast & touch access */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 10,
-          marginBottom: 20
-        }}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+        {/* Clear Digits Action Link */}
+        {hasAnyDigit && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
             <button
-              key={num}
               type="button"
-              onClick={() => handleKeypadPress(num)}
-              disabled={isVerifying}
+              onClick={handleClear}
               style={{
-                height: 48,
-                borderRadius: 12,
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                color: '#f8fafc',
-                fontSize: '1.25rem',
-                fontWeight: 700,
-                cursor: isVerifying ? 'not-allowed' : 'pointer',
-                transition: 'all 0.15s ease',
-                display: 'flex',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                gap: 5,
+                padding: '4px 8px',
+                borderRadius: 6,
+                transition: 'color 0.15s'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.2)';
-                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#ffffff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
             >
-              {num}
+              <RotateCcw size={13} />
+              <span>Clear PIN</span>
             </button>
-          ))}
-
-          {/* Clear Button */}
-          <button
-            type="button"
-            onClick={handleKeypadClear}
-            disabled={isVerifying || pinDigits.every(d => d === '')}
-            title="Clear all"
-            style={{
-              height: 48,
-              borderRadius: 12,
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              color: 'var(--text-muted)',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              cursor: isVerifying || pinDigits.every(d => d === '') ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4
-            }}
-          >
-            <RotateCcw size={16} />
-            <span>Clear</span>
-          </button>
-
-          {/* 0 Button */}
-          <button
-            type="button"
-            onClick={() => handleKeypadPress(0)}
-            disabled={isVerifying}
-            style={{
-              height: 48,
-              borderRadius: 12,
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              color: '#f8fafc',
-              fontSize: '1.25rem',
-              fontWeight: 700,
-              cursor: isVerifying ? 'not-allowed' : 'pointer',
-              transition: 'all 0.15s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.2)';
-              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            }}
-          >
-            0
-          </button>
-
-          {/* Backspace Button */}
-          <button
-            type="button"
-            onClick={handleKeypadBackspace}
-            disabled={isVerifying || pinDigits.every(d => d === '')}
-            title="Backspace"
-            style={{
-              height: 48,
-              borderRadius: 12,
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              color: 'var(--text-muted)',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              cursor: isVerifying || pinDigits.every(d => d === '') ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Delete size={20} />
-          </button>
-        </div>
+          </div>
+        )}
 
         {/* Submit Button */}
         <button
@@ -520,7 +392,8 @@ export default function AppLockScreen({ onUnlock, lockReason = '' }) {
             justifyContent: 'center',
             gap: 8,
             boxShadow: '0 8px 25px rgba(99, 102, 241, 0.35)',
-            cursor: isVerifying || pinDigits.some(d => !d) ? 'not-allowed' : 'pointer'
+            cursor: isVerifying || pinDigits.some(d => !d) ? 'not-allowed' : 'pointer',
+            marginTop: hasAnyDigit ? 0 : 8
           }}
         >
           {isVerifying ? (
