@@ -218,7 +218,7 @@ export default function TenantManager({
                   </div>
                 </div>
 
-                {/* Kiraya Lene Ki Tareekh (Rent Due Day) */}
+                {/* Kiraya Lene Ki Date (Rent Due Day) */}
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -232,10 +232,10 @@ export default function TenantManager({
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#a5b4fc', fontWeight: 600 }}>
                     <Calendar size={14} color="#818cf8" />
-                    <span>Kiraya Lene Ki Tareekh:</span>
+                    <span>Rent Collection Date:</span>
                   </div>
                   <div style={{ fontWeight: 800, color: tenant.rentDueDay ? '#38bdf8' : '#fb7185' }}>
-                    {tenant.rentDueDay ? `Har mahine ki ${tenant.rentDueDay} tareekh` : 'Not Set'}
+                    {tenant.rentDueDay ? `Every Month ${tenant.rentDueDay} Date` : 'Not Set'}
                   </div>
                 </div>
               </div>

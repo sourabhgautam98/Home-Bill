@@ -73,7 +73,7 @@ export default function BillReceiptModal({
     return `*RENT & UTILITY BILL* 🧾\n` +
       `*Owner:* Gautam Rent, Owner\n` +
       `*Kirayedaar:* ${bill.tenantName} (${bill.room ? `Room ${bill.room}` : 'Resident'})\n` +
-      (bill.rentDueDay ? `📅 *Kiraya Tareekh:* Har mahine ki ${bill.rentDueDay} tareekh\n` : '') +
+      (bill.rentDueDay ? `📅 *Rent Due Date:* Every Month ${bill.rentDueDay} Date\n` : '') +
       `*Date:* ${bill.billDate || ''} (${bill.billingMonth})\n` +
       `--------------------------------\n` +
       `🏠 *Rent:* ${currencySymbol}${bill.rentAmount}\n` +
@@ -319,22 +319,7 @@ export default function BillReceiptModal({
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div className="receipt-badge-title" style={{
-                  display: 'inline-block',
-                  backgroundColor: '#e0e7ff',
-                  color: '#4338ca',
-                  fontWeight: 800,
-                  fontSize: '0.8rem',
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  letterSpacing: '0.05em'
-                }}>
-                  RENT & UTILITY BILL
-                </div>
-                <div style={{ fontSize: '0.825rem', fontWeight: 700, color: '#0f172a', marginTop: 6 }}>
-                  Bill #: {bill.billNo || 'INV-001'}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                <div style={{ fontSize: '0.825rem', color: '#64748b', marginTop: 6 }}>
                   Date: {bill.billDate || new Date().toISOString().split('T')[0]}
                 </div>
               </div>
@@ -364,7 +349,7 @@ export default function BillReceiptModal({
                 </div>
                 {bill.rentDueDay && (
                   <div style={{ fontSize: '0.78rem', color: '#4f46e5', fontWeight: 600, marginTop: 3 }}>
-                    Kiraya Tareekh: Har mahine ki {bill.rentDueDay} tareekh
+                    Rent Due Date: Every Month {bill.rentDueDay} Date
                   </div>
                 )}
               </div>
@@ -405,8 +390,8 @@ export default function BillReceiptModal({
                 }}>
                   <thead>
                     <tr style={{ backgroundColor: '#f1f5f9', color: '#334155' }}>
-                      <th style={{ padding: '8px 8px', textAlign: 'center', border: '1px solid #cbd5e1' }}>Purani Reading</th>
-                      <th style={{ padding: '8px 8px', textAlign: 'center', border: '1px solid #cbd5e1' }}>Nayi Reading</th>
+                      <th style={{ padding: '8px 8px', textAlign: 'center', border: '1px solid #cbd5e1' }}>Old Reading</th>
+                      <th style={{ padding: '8px 8px', textAlign: 'center', border: '1px solid #cbd5e1' }}>New Reading</th>
                       <th style={{ padding: '8px 8px', textAlign: 'center', border: '1px solid #cbd5e1' }}>Units Consumed</th>
                       <th style={{ padding: '8px 8px', textAlign: 'center', border: '1px solid #cbd5e1' }}>Rate per Unit</th>
                       <th style={{ padding: '8px 8px', textAlign: 'right', border: '1px solid #cbd5e1' }}>Electricity Total</th>

@@ -316,7 +316,7 @@ export default function BillGenerator({
               >
                 {tenants.map(t => (
                   <option key={t.id} value={t.id} style={{ backgroundColor: '#111827', color: '#ffffff' }}>
-                    {t.name}{t.room ? ` (${t.room})` : ''}{t.rentDueDay ? ` • Due: ${t.rentDueDay} tareekh` : ''}
+                    {t.name}{t.room ? ` (${t.room})` : ''}{t.rentDueDay ? ` • Due: ${t.rentDueDay} Date` : ''}
                   </option>
                 ))}
               </select>
@@ -641,7 +641,7 @@ export default function BillGenerator({
                     fontWeight: 600
                   }}>
                     <Calendar size={12} color="#818cf8" />
-                    <span>Kiraya Tareekh: Har mahine ki {selectedTenant.rentDueDay} tareekh</span>
+                    <span>Rent Due Date: Every Month {selectedTenant.rentDueDay} Date</span>
                   </div>
                 )}
               </div>

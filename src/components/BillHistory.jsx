@@ -1,26 +1,26 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Receipt, 
-  Search, 
-  Eye, 
-  Trash2, 
-  Zap, 
-  ChevronDown, 
-  ChevronUp, 
-  User, 
-  Calendar, 
-  Building, 
+import {
+  Receipt,
+  Search,
+  Eye,
+  Trash2,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Calendar,
+  Building,
   Phone,
   FileText,
   X
 } from 'lucide-react';
 import { formatCurrency } from '../utils/numberToWords';
 
-export default function BillHistory({ 
-  bills, 
-  onViewBill, 
-  onDeleteBill, 
-  currencySymbol = '₹' 
+export default function BillHistory({
+  bills,
+  onViewBill,
+  onDeleteBill,
+  currencySymbol = '₹'
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTenants, setExpandedTenants] = useState({});
@@ -68,7 +68,7 @@ export default function BillHistory({
       const matchesName = g.name.toLowerCase().includes(q);
       const matchesRoom = g.room.toLowerCase().includes(q);
       const matchesPhone = g.phone.includes(q);
-      const matchesBills = g.bills.some(b => 
+      const matchesBills = g.bills.some(b =>
         (b.billNo && b.billNo.toLowerCase().includes(q)) ||
         (b.billingMonth && b.billingMonth.toLowerCase().includes(q)) ||
         (b.billDate && b.billDate.includes(q))
@@ -253,11 +253,11 @@ export default function BillHistory({
           {filteredGroups.map(group => {
             const isExpanded = expandedTenants[group.name] !== undefined ? expandedTenants[group.name] : true;
             return (
-              <div 
-                key={group.name} 
-                className="glass-card" 
-                style={{ 
-                  borderRadius: 14, 
+              <div
+                key={group.name}
+                className="glass-card"
+                style={{
+                  borderRadius: 14,
                   overflow: 'hidden',
                   border: isExpanded ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
                   transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
@@ -265,7 +265,7 @@ export default function BillHistory({
                 }}
               >
                 {/* Clickable Kirayedaar Group Header */}
-                <div 
+                <div
                   onClick={() => toggleTenant(group.name)}
                   style={{
                     padding: '16px 20px',
@@ -325,7 +325,7 @@ export default function BillHistory({
                             gap: 4
                           }}>
                             <Calendar size={11} />
-                            <span>Due: {group.rentDueDay} tareekh</span>
+                            <span>Due: {group.rentDueDay} Date</span>
                           </span>
                         )}
                       </div>
@@ -392,9 +392,9 @@ export default function BillHistory({
                         </thead>
                         <tbody>
                           {group.bills.map((bill, index) => (
-                            <tr 
-                              key={bill.id} 
-                              style={{ 
+                            <tr
+                              key={bill.id}
+                              style={{
                                 borderBottom: index === group.bills.length - 1 ? 'none' : '1px solid rgba(255, 255, 255, 0.05)',
                                 backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)'
                               }}

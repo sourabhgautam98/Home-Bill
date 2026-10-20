@@ -100,7 +100,7 @@ export default function KirayedaarModal({
     }
 
     if (!formData.rentDueDay || isNaN(formData.rentDueDay) || Number(formData.rentDueDay) < 1 || Number(formData.rentDueDay) > 31) {
-      setFormError('Kiraya lene ki tareekh select karna zaroori hai (1 se 31 ke beech).');
+      setFormError('Rent Collection Date select karna zaroori hai (1 se 31 ke beech).');
       return;
     }
 
@@ -223,8 +223,8 @@ export default function KirayedaarModal({
               <label className="input-label" style={{ margin: 0 }}>
                 Mobile Number *
               </label>
-              <span style={{ 
-                fontSize: '0.72rem', 
+              <span style={{
+                fontSize: '0.72rem',
                 color: formData.phone.length === 10 ? '#10b981' : (formData.phone.length > 0 ? '#f59e0b' : 'var(--text-muted)'),
                 fontWeight: 600
               }}>
@@ -313,7 +313,7 @@ export default function KirayedaarModal({
             </div>
           </div>
 
-          {/* Kiraya Lene Ki Tareekh (Rent Due Day) - REQUIRED */}
+          {/* Kiraya Lene Ki Date (Rent Due Day) - REQUIRED */}
           <div style={{
             padding: '14px',
             backgroundColor: 'rgba(99, 102, 241, 0.07)',
@@ -323,11 +323,11 @@ export default function KirayedaarModal({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <label className="input-label" style={{ margin: 0, color: '#a5b4fc', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Calendar size={14} />
-                <span>Kiraya Lene Ki Tareekh (Rent Due Date) *</span>
+                <span>Rent Collection Date *</span>
               </label>
               {formData.rentDueDay && (
                 <span style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 700 }}>
-                  Har mahine ki {formData.rentDueDay} tareekh
+                  Every Month {formData.rentDueDay} Date
                 </span>
               )}
             </div>
@@ -339,12 +339,12 @@ export default function KirayedaarModal({
               onChange={(e) => setFormData({ ...formData, rentDueDay: e.target.value })}
               style={{ fontSize: '0.95rem', fontWeight: 600, width: '100%', borderColor: formData.rentDueDay ? '#818cf8' : undefined }}
             >
-              <option value="" disabled>-- Kiraya kis tareekh ko lena hai? (1 to 31) * --</option>
+              <option value="" disabled>-- Rent Collection Date: (1 to 31) * --</option>
               {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
                 const suffix = (day > 3 && day < 21) ? 'th' : (day % 10 === 1 ? 'st' : day % 10 === 2 ? 'nd' : day % 10 === 3 ? 'rd' : 'th');
                 return (
                   <option key={day} value={day} style={{ backgroundColor: '#111827', color: '#ffffff' }}>
-                    {day} tareekh ({day}{suffix} of every month)
+                    {day} Date ({day}{suffix} of every month)
                   </option>
                 );
               })}
@@ -369,12 +369,12 @@ export default function KirayedaarModal({
                     cursor: 'pointer'
                   }}
                 >
-                  {day} tareekh
+                  {day} Date
                 </button>
               ))}
             </div>
             <p style={{ fontSize: '0.73rem', color: 'var(--text-dim)', margin: '6px 0 0' }}>
-              Har mahine is tareekh ko kirayedaar se kiraya lena hai.
+              Har mahine is Date ko kirayedaar se kiraya lena hai.
             </p>
           </div>
 
